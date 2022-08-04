@@ -124,11 +124,6 @@ void setup()
   else
   {
     Serial.println("Connected to server!");
-    // Make a HTTP request:
-    client.println("GET https://www.howsmyssl.com/a/check HTTP/1.0");
-    client.println("Host: www.howsmyssl.com");
-    client.println("Connection: close");
-    client.println();
 
     while (client.connected())
     {
