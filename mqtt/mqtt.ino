@@ -129,6 +129,6 @@ void reConnect()
         M5.Lcd.println(", try again in 5 seconds");
         delay(5000);
     }
-    delay(10000)
+    delay(10000);
     // }
 }
