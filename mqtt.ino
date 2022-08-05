@@ -2,9 +2,8 @@
 *******************************************************************************
 * Copyright (c) 2021 by M5Stack
 *                  Equipped with M5StickC-Plus sample source code
-*                          配套  M5StickC-Plus 示例源代码
+*                              M5StickC-Plus
 * Visit for more information: https://docs.m5stack.com/en/core/m5stickc_plus
-* 获取更多资料请访问: https://docs.m5stack.com/zh_CN/core/m5stickc_plus
 *
 * Describe: MQTT.
 * Date: 2021/11/5
@@ -28,6 +27,7 @@ int value = 0;
 void setupWifi();
 void callback(char *topic, byte *payload, unsigned int length);
 void reConnect();
+void setupCredentials();
 
 void setup()
 {
@@ -36,9 +36,7 @@ void setup()
     setupWifi();
     setupCredentials();
     M5.begin();
-    M5.Lcd.setTextColor(WHITE);
-    M5.Lcd.setTextSize(2);
-    
+ 
     pinMode(10, OUTPUT);
 
     client.setServer(mqtt_server, 8883); // Sets the server details.
@@ -49,25 +47,25 @@ void setup()
 void loop() {
   M5.update();
   ledSwitch();
-
-  
 }
 
 void ledSwitch(){
-  if(M5.BtnA.wasReleased()){
+  if(M5.BtnA.wasReleased() && digitalRead(10) == HIGH){
     digitalWrite(10,LOW);
+    ledState();
     if (client.connected() || client.connect(THINGNAME)){
       client.publish("$aws/things/grupo3/shadow/update",
         "{\"state\": {\"desired\": {\"led\": 1}}}");
     }
   }
-  else if (M5.BtnA.wasReleasefor(700)) {
+  
+  else if (M5.BtnA.wasReleasefor(700) && digitalRead(10) == LOW) {
     digitalWrite(10,HIGH);
+    ledState();
     if (client.connected() || client.connect(THINGNAME)){
       client.publish("$aws/things/grupo3/shadow/update",
         "{\"state\": {\"desired\": {\"led\": 0}}}");
     }
-  }
   }
 }
 
