@@ -1,0 +1,94 @@
+#include <pgmspace.h>
+
+#define SECRET
+
+const char ssid[] = "CSW-Guest";
+const char password[] = "Critical98";
+
+#define THINGNAME "grupo3"
+
+int8_t TIME_ZONE = 0;         // UTC
+#define USE_SUMMER_TIME_DST 1 // uncomment to use DST
+
+const char mqtt_server[] = "a1yj9lgdqxsds2-ats.iot.eu-west-2.amazonaws.com";
+
+// Obtain First CA certificate for Amazon AWS
+// https://docs.aws.amazon.com/iot/latest/developerguide/managing-device-certs.html#server-authentication
+// Copy contents from CA certificate here ▼
+static const char cacert[] PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF
+ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6
+b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL
+MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv
+b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj
+ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM
+9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw
+IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6
+VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L
+93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm
+jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC
+AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA
+A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI
+U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs
+N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv
+o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU
+5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy
+rqXRfboQnoZsG4q5WTP468SQvvG5
+-----END CERTIFICATE-----
+)EOF";
+
+// Copy contents from XXXXXXXX-certificate.pem.crt here ▼
+static const char client_cert[] PROGMEM = R"KEY(
+-----BEGIN CERTIFICATE-----
+MIIDWjCCAkKgAwIBAgIVANAkgDvXWEl9con6FR5KdoE7s4KjMA0GCSqGSIb3DQEB
+CwUAME0xSzBJBgNVBAsMQkFtYXpvbiBXZWIgU2VydmljZXMgTz1BbWF6b24uY29t
+IEluYy4gTD1TZWF0dGxlIFNUPVdhc2hpbmd0b24gQz1VUzAeFw0yMjA4MDUwODU4
+NTZaFw00OTEyMzEyMzU5NTlaMB4xHDAaBgNVBAMME0FXUyBJb1QgQ2VydGlmaWNh
+dGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDBaXbNxAFfS8JNOFVj
+kmEJFCxLI3XrqbD/ILcvNHkoCf7rq9h2DeRruS87YlnDTK5fwuduVslNwa821umm
+zrMyfe1oW/QkiNcT3DxvX2z08FpHZM3K6buXtWNsvOPEW8//F/AGlOq3FQeobXhN
+fu5qMqFUGbJ/VZ6vqLvW2mm5lSOxNpupr69/Hf09QrAryoaec5wFPzd87mr3Bwil
+7jGBcPTBpPa5tg7DTODRWh6z82fVV7t0du5a0QHPG8n75voILX6jzfURUWz6WeOG
+DXEbXXoujR5OW3ADd4KUw2bU/KRpYhGQI4n+5MT/0whSaGmlV9vgBA3aT/x9Pdx+
+x1bBAgMBAAGjYDBeMB8GA1UdIwQYMBaAFKOm1ERk3XHUYtubEjfoFv2J0meGMB0G
+A1UdDgQWBBTudMWwq0j/VSrrovGVR6MmsvOdcjAMBgNVHRMBAf8EAjAAMA4GA1Ud
+DwEB/wQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEAOxDExQnyCchzN4BJwTl9RcGW
+41mUHhCEabr7lQ9Kg+HMfhWsmxV/6f13GJ/n/mmPI9PzzDt4V7/0PjGqEOd1/hSv
+o/V+6W4hFTHYDEzjqNU7UnhHfwbAmApLOTt2Jp+k/PGZf4aSNyO4zGJPrdX1AeSt
+j72vcSv1KBw33efXzJ2huF4g6DMvuEI/sBxZ4+7AQfTfibQPE1+1R/r9t7NC3fEF
+vkLpDh7uLosyCc6F6OgXTa+dgr38oPBkiYxyUpi0G3JGPSBdMsQFxolfHbn92vbi
+90M+hTK5vrzStZZ3nKSGfr5oghzMO/d+52d3DqLij+0aZZ7D4bLS0PVLdnONpQ==
+-----END CERTIFICATE-----
+)KEY";
+
+// Copy contents from  XXXXXXXX-private.pem.key here ▼
+static const char privkey[] PROGMEM = R"KEY(
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAwWl2zcQBX0vCTThVY5JhCRQsSyN166mw/yC3LzR5KAn+66vY
+dg3ka7kvO2JZw0yuX8LnblbJTcGvNtbpps6zMn3taFv0JIjXE9w8b19s9PBaR2TN
+yum7l7VjbLzjxFvP/xfwBpTqtxUHqG14TX7uajKhVBmyf1Wer6i71tppuZUjsTab
+qa+vfx39PUKwK8qGnnOcBT83fO5q9wcIpe4xgXD0waT2ubYOw0zg0Voes/Nn1Ve7
+dHbuWtEBzxvJ++b6CC1+o831EVFs+lnjhg1xG116Lo0eTltwA3eClMNm1PykaWIR
+kCOJ/uTE/9MIUmhppVfb4AQN2k/8fT3cfsdWwQIDAQABAoIBAQCaj0EVZhECqnP3
+aZEzJQLOUoSi9w+A5/Y9q1M4MeKwEGzawFUW4jsrqq0H86xv2ZNviz2Oe2Qa8zCl
+zlChsISbUO6revA7Ue8uO80/4y4a/wfmDbQ291ml/poZh0ks3YH2BJcXa2G2NOQN
+wI1mwIyd6R/rKS3ve+h3z4tsQtZCKns6xntypEHw325Zj3dNe7ALtkVZ/Qzf3W5P
+zjf0YUKH6XMP0rl1HI7txfN3DsM/4KfcPCh6ngTEJf1oT4yUnUmp1WH6V/MqPEOs
+jmOEStmSlJ/yKtInyvVlhbz/LR3tD3DvzYiue62nh7vkwpqYjfwT/Jv6QwEhIqI3
+go102xaRAoGBAPTZKED4Rj57jq5iZLfptmX6HAXqj3o0sU9vij5Yqu5oxPfxH7yt
+3qN1sPIqHja2QTJcgaOZP13vBAudrJICP0JQxdgoi6aonznfHpasrafrmYOQwFi5
+WU1dlx8SrvaI24dYQkiZdF2gPChkoCpZgls/Rx4xqdva5oMHliiMPxdDAoGBAMo4
+k/v5vN5sfbHxG95YtKpBQjXYqm065IY9iZ4oxZ+c3azgwn9wSsI9znMdtfr2qGAS
+ibLGtsF3sdC4KmPFmPHFmsfl3nbVLP/G+FowuQ2c9H/rY9UTCbJCGsyPEmZapm6L
+qq7hbdQTKO/qr8psh2Za/s/AxpPRXgAWUEx/lK+rAoGAedIdvA2K7YWOHOdpkzOe
+A6joDm2Ay12yJoKpdpGpIgtQjMgUcUzUq+Ffk20vMSuGzqbF/X6+z16fVaQye0bQ
+8I69kOnDab0V07ZWQsNRd226KIJ5oOs/KkX5bYVfNdwr1XAtMm/fPMH/jF1cbxWv
+zPRzzusIxxFnhSPeKvh0X38CgYBOoimJNddndjB6XRNFJqE6Ax5H6fR7fQcX3B4D
+Tj9qjYj1jICVJYksdvQsd0UoTXmzwgGhbvvpxy1xx+tT2KZcfUZurMgQ1VwmKayx
+BXkv/fRlOZccZ8bBdksNeCTjgCRvoAfC8Q3QBZNJl6y7ve/4sTGcf424NRWkWwjm
+dkXO+QKBgECtaOBHo/IhipF6VVDwkN6vG3ANmlXx5OjQbCLkQbd6fb5cYBcIpAoT
+pJ1V3mBZ6/oniflKwu/so3efwCjwAwb5enfzR3dMv4QFc8UqgAOxvngybv2OGlQs
+pUQIHfoKXAS8Dc0HP3zNMu8w2sUoqYEghVtjb1P4xyAKb5cXZFXO
+-----END RSA PRIVATE KEY-----
+)KEY";
