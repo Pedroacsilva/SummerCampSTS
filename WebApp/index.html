@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Carla</title>
 </head>
 
@@ -22,14 +23,14 @@
 
     .btndiv{
         margin: 0 auto;
-        display: inline; 
+        display: inline;
         display: flex;
         justify-content: center;
         text-align: center;
     }
 
     .btn{
-        font-family: 'Comfortaa', cursive; 
+        font-family: 'Comfortaa', cursive;
         font-weight: bolder;
         cursor: pointer;
         margin: 0 auto;
@@ -44,7 +45,7 @@
         var data = JSON.stringify({ "led": false });
         sendGET(data);
     }
-    
+
     function switchLedOn() {
         var data = JSON.stringify({ "name": true });
         sendGET(data);
@@ -63,12 +64,12 @@
     <div>
         <h3 class="text"> Click here to change the state of the LED </h3>
         <div class="btndiv">
-            <button class="btn" 
-            style="margin-left: 45%; background-color: rgb(130, 237, 130);" 
-            onclick="switchLedOn()">ON</button> 
-            <button class="btn" 
-            style="margin-right: 45%; background-color: rgb(241, 160, 160)" 
-            onclick="switchLedOff()">OFF</button> 
+            <button class="btn"
+            style="margin-left: 45%; background-color: rgb(130, 237, 130);"
+            onclick="switchLedOn()">ON</button>
+            <button class="btn"
+            style="margin-right: 45%; background-color: rgb(241, 160, 160)"
+            onclick="switchLedOff()">OFF</button>
         </div>
     </div>
 </body>
